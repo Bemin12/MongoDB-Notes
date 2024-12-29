@@ -324,7 +324,7 @@ MongoDB offers additional comparison operators beyond these core ones—explorin
      db.accounts.find({ "products": "investment stock" });
      ```
    - This query finds all documents in the `accounts` collection where the `products` field contains `"investment stock"` as a value, either as a single element in an array or a scalar value.
-	   ![[assets/Screenshot (55) 1.png]]
+	   ![Screenshot (55) 1.png](assets/Screenshot%20(55)%201.png)
 
 2. **Using `$elemMatch`**:
    - **Purpose**: Ensures that only documents with a specified value as an element of an array are returned.
@@ -401,14 +401,14 @@ db.collction.find({expression, expression})
 `$or`  is the same
 
 Both
-![[assets/Screenshot (59) 2.png]]
+![Screenshot (59) 2.png](assets/Screenshot%20(59)%202.png)
 
-![[assets/Screenshot (60) 2.png]]
+![Screenshot (60) 2.png](assets/Screenshot%20(60)%202.png)
 
 But if we used the implicit `$and`, that's what will happen
-![[assets/Screenshot (62) 2.png]]
+![Screenshot (62) 2.png](assets/Screenshot%20(62)%202.png)
 The first $or expression was overwritten by the second one; This happen because we can't store two fields with the same name in the same JSON object 
-![[assets/Screenshot (64) 2.png]]
+![Screenshot (64) 2.png](assets/Screenshot%20(64)%202.png)
 As a general rule, When including the same operator more than once in your query, you need to use the explicit $and operator.
 
 ___
@@ -1178,7 +1178,7 @@ The `$project` stage specifies the fields of the output documents. 1 means tha
 It should be the last stage to format the output
 MongoDB already works out which fields are needed and reads only the fields that are required in the pipeline, so there's usually no reason to use project earlier in the pipeline
 
-![[assets/Pasted image 20241107032511.png]]
+![Pasted image 20241107032511.png](assets/Pasted%20image%2020241107032511.png)
 
 ```js
 {
@@ -1314,14 +1314,14 @@ ___
    - **Performance Improvement**: 
      - Reduces the need for **collection scans** (reading each document to match queries).
      - Supports **equality and range-based queries**, allowing for faster lookups and sorted outputs.
- ![[assets/Screenshot (66).png]]
+ ![Screenshot (66).png](assets/Screenshot%20(66).png)
  
    - **Efficiency Gains**:
      - Lowers **disk I/O** and **resource usage**.
      - Avoids reading full documents if the index covers all query fields.
 
-![[assets/Screenshot (99).png]]
-![[assets/Screenshot (100).png]]
+![Screenshot (99).png](assets/Screenshot%20(99).png)
+![Screenshot (100).png](assets/Screenshot%20(100).png)
 
 #### **2. Default and Additional Indexes**
    - **Default Index**: Every collection has a default index on the `_id` field.
@@ -1341,8 +1341,8 @@ ___
    - **Example Scenario**: Searching for customers who are `active` and have a specific `account`.
    - **Solution**: A **compound index** on `active` and `accounts` fields will improve query speed.
    - Since `accounts` is an array field, this index is a **multikey compound index**.
-	![[assets/Screenshot (105).png]]
-	![[assets/Screenshot (106).png]]
+	![Screenshot (105).png](assets/Screenshot%20(105).png)
+	![Screenshot (106).png](assets/Screenshot%20(106).png)
 #### **Recap**
    - Indexes store ordered fields from a collection to support faster data retrieval, equality, and range-based operations, and they allow sorting without reading all documents.
    - **Types**: Single-field, compound, and multikey indexes.
@@ -1391,7 +1391,7 @@ ___
      ```javascript
      db.customers.find({ birthdate: { $gt: ISODate("1995-08-01") } }).explain();
      ```
-     ![[assets/Screenshot (107).png]]
+     ![Screenshot (107).png](assets/Screenshot%20(107).png)
    - **Understanding the Query Plan**:
     - **Winning Plan**: This section of the `explain` output shows the most efficient way MongoDB executes the query.
     - A `winningPlan` is a document that contains information about the query and the method that was used to execute the query.
@@ -1413,15 +1413,15 @@ ___
 db.customers.find({birthdate: {$lt: ISODate("1966-08-01")}}).sort({email: 1}).explain()
 		```
 		   
-	    ![[assets/Screenshot (109).png]]
-	    ![[assets/Screenshot (111).png]]
+	    ![Screenshot (109).png](assets/Screenshot%20(109).png)
+	    ![Screenshot (111).png](assets/Screenshot%20(111).png)
      - **Optimization Tip**: Creating a compound index on `birthdate` and `email` would allow MongoDB to optimize both the filter and the sort, improving query performance.
      - The query optimizer considered using email_1 index, which would support the sort but not the query filter, but it was rejected
      
 	    ```js
     db.customers.explain().find({accounts: 871666})
 	```
-![[assets/Pasted image 20241109174430.png]]
+![Pasted image 20241109174430.png](assets/Pasted%20image%2020241109174430.png)
 The `winningPlan` is a collection scan `COLLSCAN` because there are no indexes that can be used for the accounts field
 #### **6. Collection Scans and Index Creation Needs**
    - **Collection Scan**: If no index is available, MongoDB performs a full scan on the collection, which is slower.
@@ -1472,7 +1472,7 @@ ___
        ```javascript
        db.customers.find({ accounts: 627788 }).explain();
        ```
-       ![[assets/Pasted image 20241109181106.png]]
+       ![Pasted image 20241109181106.png](assets/Pasted%20image%2020241109181106.png)
    - **Index Scan (IXSCAN)**: When the index is used, the `IXSCAN` stage appears in the `winningPlan`, showing that MongoDB scans the index for matching values.
    - **Fetch Stage**: After identifying relevant documents with `IXSCAN`, MongoDB typically performs a `FETCH` stage to retrieve the complete documents, as each array value is stored as a separate index entry. (multikey indexes need to fetch the documents after the IXSCAN stage because the index entries have each of the array values stored separately)
 
@@ -1504,9 +1504,9 @@ ___
 - **Recommended Order** ([The ESR (Equality, Sort, Range) Rule](https://www.mongodb.com/docs/manual/tutorial/equality-sort-range-rule/#the-esr--equality--sort--range--rule "Permalink to this heading")):
 	- The recommended order of indexed fields in a compound index is Equality, Sort, and Range. Optimized queries use the first field in the index, Equality, to determine which documents match the query. The second field in the index, Sort, is used to determine the order of the documents. The third field, Range, is used to determine which documents to include in the result set.
     1. **Equality Filters**: Fields tested for equality (`field = value`) should appear first.
-		![[assets/Screenshot (119).png]]
+		![Screenshot (119).png](assets/Screenshot%20(119).png)
     2. **Sort Fields**: Fields used for sorting come next, following the query's sort order.
-	    ![[assets/Screenshot (121).png]]
+	    ![Screenshot (121).png](assets/Screenshot%20(121).png)
     3. **Range Filters**: Fields used in range queries (`>=`, `<=`, etc.) should come last.
 	
 	In general, it's recommended that range and sort should be placed after equality in the index to avoid in-memory sort or filtering.
@@ -1566,7 +1566,7 @@ db.customers.createIndex({ active: 1, birthdate: -1, name: 1 });
 		- PROJECTION_COVERED - All the information needed is returned by the index, no need to fetch from memory
 
 - If a query projects additional fields that we don't use to filter or sort by, we can include those fields at the end of the field list when we create the index. This way we use the index to cover the query and avoid fetching the documents.
-	![[assets/Pasted image 20241121200357.png]]
+	![Pasted image 20241121200357.png](assets/Pasted%20image%2020241121200357.png)
 
 ---
 
@@ -2007,7 +2007,7 @@ A **search index** defines how a relevance-based search should be performed on y
         
         > _Note: Index creation may take some time, and you’ll be notified once it’s ready._
      
-![[assets/Pasted image 20241122190611.png]]
+![Pasted image 20241122190611.png](assets/Pasted%20image%2020241122190611.png)
 
 
 
@@ -2172,10 +2172,10 @@ Static mapping is useful when:
         Example: The **birds** collection in the **bird guide** database.
 3. **Configure Field Mappings**:
 	Let's imagine we're creating a bird guidebook application. In this case, the most important fields that contain information that our user might search by are common name, scientific name, habitat, and diet. Dynamic mapping indexes all of the fields present in a collection. In order to save time and processing power, we'll toggle off dynamic mapping and only index the fields that we anticipate will contain the search terms that our end user might query
-	![[assets/Pasted image 20241124130545.png]]
-	![[assets/Pasted image 20241124130549.png]]
+	![Pasted image 20241124130545.png](assets/Pasted%20image%2020241124130545.png)
+	![Pasted image 20241124130549.png](assets/Pasted%20image%2020241124130549.png)
     - Toggle **off** dynamic mapping to disable automatic indexing of all fields.
-	     ![[assets/Pasted image 20241124130646.png]]
+	     ![Pasted image 20241124130646.png](assets/Pasted%20image%2020241124130646.png)
     - Use the **Add Field** option to manually select specific fields to index.
         - Example: For a bird guide application, select fields like:
             - `common name`
@@ -2295,7 +2295,7 @@ The following code is a snippet from a search index. What type of field mapping 
 }
 ```
 
-![[assets/Pasted image 20241124132455.png]]
+![Pasted image 20241124132455.png](assets/Pasted%20image%2020241124132455.png)
 
 ___
 
@@ -3116,7 +3116,7 @@ By adhering to this principle, you can reduce query complexity, optimize perform
         }
         ```
 
-![[assets/Pasted image 20241125164017.png]]
+![Pasted image 20241125164017.png](assets/Pasted%20image%2020241125164017.png)
 
 ---
 
@@ -3183,7 +3183,7 @@ When a student starts school, their profile is created in the database. This pro
 #### **Contact Phone Numbers**
 
 - **Original Representation**: Each phone number is stored as a separate item.
-	![[assets/Pasted image 20241125165811.png]]
+	![Pasted image 20241125165811.png](assets/Pasted%20image%2020241125165811.png)
     - **Issue**: This creates redundancy and lacks organization.
 - **Improved Representation**: Use an array to represent a one-to-many relationship.
     
@@ -3311,7 +3311,7 @@ Embedding involves nesting one document inside another. It is particularly usefu
 
 **Multi-level embedding** for a one-to-many relationship, such as a customer with multiple addresses:
 
-![[assets/Pasted image 20241125170857.png]]
+![Pasted image 20241125170857.png](assets/Pasted%20image%2020241125170857.png)
 In this case:
 
 - The `Address` field is an array of embedded documents.
@@ -3415,7 +3415,7 @@ While embedding aligns with this principle, referencing is useful when:
 
 A student record that references the courses they are enrolled in.
 
-![[assets/Pasted image 20241125172746.png]]
+![Pasted image 20241125172746.png](assets/Pasted%20image%2020241125172746.png)
 
 **Student Document (in `students` collection):**
 
@@ -3475,7 +3475,7 @@ Here:
 
 ---
 
-![[assets/Pasted image 20241125172552.png]]
+![Pasted image 20241125172552.png](assets/Pasted%20image%2020241125172552.png)
 
 ___
 ### **When to Use References**
@@ -3546,7 +3546,7 @@ Unbounded documents are those that grow infinitely as new data is added. These a
 
 #### **Initial Model (Embedding Comments):**
 
-![[assets/Pasted image 20241125190324.png]]
+![Pasted image 20241125190324.png](assets/Pasted%20image%2020241125190324.png)
 
 ```json
 {
@@ -3575,7 +3575,7 @@ This model:
 
 To scale efficiently, separate comments into their own collection and use references.
 
-![[assets/Pasted image 20241125190334.png]]
+![Pasted image 20241125190334.png](assets/Pasted%20image%2020241125190334.png)
 #### **Blog Post Collection:**
 
 ```json
@@ -3679,12 +3679,12 @@ MongoDB Atlas provides two main tools to help identify and fix schema anti-patte
 - Features:
     - View **storage size**, **document count**, and **index size** for collections.
     - **Indexes Tab**: Displays indexes and their stats to identify unused or redundant ones.
-	    ![[assets/Pasted image 20241125192235.png]]
+	    ![Pasted image 20241125192235.png](assets/Pasted%20image%2020241125192235.png)
     - **Schema Anti-Pattern Tab**:
         - Highlights potential schema design issues.
         - Provides detailed recommendations for resolving them.
     - Example Action: Dropping unused indexes by sorting them based on usage.
-	    ![[assets/Pasted image 20241125192316.png]]
+	    ![Pasted image 20241125192316.png](assets/Pasted%20image%2020241125192316.png)
 
 #### **2. Performance Advisor (Available in M10 Tier and Above):**
 
@@ -3693,7 +3693,7 @@ MongoDB Atlas provides two main tools to help identify and fix schema anti-patte
     - Recommends **new indexes** for slow or frequent queries.
     - Identifies **redundant indexes** that can be dropped.
     - Highlights **schema issues** impacting performance.
-	    ![[assets/Pasted image 20241125192400.png]]
+	    ![Pasted image 20241125192400.png](assets/Pasted%20image%2020241125192400.png)
 
 ---
 
@@ -4021,7 +4021,7 @@ This lesson explains how **ACID transactions** work in MongoDB's document model,
     - Changes are visible simultaneously to all clients.
     - No additional steps are required to ensure ACID compliance.
 
-![[assets/Pasted image 20241126121044.png]]
+![Pasted image 20241126121044.png](assets/Pasted%20image%2020241126121044.png)
 
 ---
 
@@ -4030,9 +4030,9 @@ This lesson explains how **ACID transactions** work in MongoDB's document model,
 - Operations affecting **multiple documents** are **not inherently atomic**. To make them atomic, they must be wrapped in a **multidocument ACID transaction**.
 - Example: In an e-commerce application:
     - Adding an item to a shopping cart (updates a document in the `shoppingCart` collection).
-	    ![[assets/Pasted image 20241126121350.png]]
+	    ![Pasted image 20241126121350.png](assets/Pasted%20image%2020241126121350.png)
     - Deducting the same item from the inventory (updates a document in the `inventory` collection).  
-	    ![[assets/Pasted image 20241126121416.png]]
+	    ![Pasted image 20241126121416.png](assets/Pasted%20image%2020241126121416.png)
         Both operations must succeed or fail together to ensure data consistency.
 
 ---
