@@ -324,7 +324,7 @@ MongoDB offers additional comparison operators beyond these core ones—explorin
      db.accounts.find({ "products": "investment stock" });
      ```
    - This query finds all documents in the `accounts` collection where the `products` field contains `"investment stock"` as a value, either as a single element in an array or a scalar value.
-	   ![Screenshot (55) 1.png](assets/Screenshot%20(55)%201.png)
+	   ![Alt text](assets/Screenshot%20(55)%201.png)
 
 2. **Using `$elemMatch`**:
    - **Purpose**: Ensures that only documents with a specified value as an element of an array are returned.
@@ -401,14 +401,14 @@ db.collction.find({expression, expression})
 `$or`  is the same
 
 Both
-![Screenshot (59) 2.png](assets/Screenshot%20(59)%202.png)
+![Alt text](assets/Screenshot%20(59)%202.png)
 
-![Screenshot (60) 2.png](assets/Screenshot%20(60)%202.png)
+![Alt text](assets/Screenshot%20(60)%202.png)
 
 But if we used the implicit `$and`, that's what will happen
-![Screenshot (62) 2.png](assets/Screenshot%20(62)%202.png)
+![Alt text](assets/Screenshot%20(62)%202.png)
 The first $or expression was overwritten by the second one; This happen because we can't store two fields with the same name in the same JSON object 
-![Screenshot (64) 2.png](assets/Screenshot%20(64)%202.png)
+![Alt text](assets/Screenshot%20(64)%202.png)
 As a general rule, When including the same operator more than once in your query, you need to use the explicit $and operator.
 
 ___
@@ -452,7 +452,7 @@ ___
      - `matchedCount`: The number of documents that matched the filter criteria.
      - `modifiedCount`: The number of documents that were replaced.
    - Example output:
-     ```js
+     ```json
      {
 	   "acknowledged": true,
 	   insertedId: null,
@@ -490,7 +490,7 @@ The `updateOne()` method accepts a __filter document__, an __update document__
 
 The `$set` operator replaces the value of a field with the specified value or Adds new fields and values to a document, as shown in the following code:
 
-```js
+```json
 db.podcasts.updateOne(
   {
     _id: ObjectId("5e8f8f8f8f8f8f8f8f8f8f8"),
@@ -505,7 +505,7 @@ db.podcasts.updateOne(
 ```
 
 The output message shows the matched and modified document counts
-```js
+```json
     {
 	   "acknowledged": true,
 	   insertedId: null,
@@ -519,7 +519,7 @@ If the update filter doesn't match any documents, then no update occurs.
 
 The `upsert` option creates a new document if no documents match the filtered criteria. Here's an example:
 
-```js
+```json
 db.podcasts.updateOne(
   { title: "The Developer Hub" },
   { $set: { topics: ["databases", "MongoDB"] } },
@@ -532,7 +532,7 @@ The `upsert` is short for _update or insert_
 
 The `$push` operator adds a new value to the `hosts` array field. If the field is absent, `$push` adds the array field with the value as its element Here's an example:
 
-```js
+```json
 db.podcasts.updateOne(
   { _id: ObjectId("5e8f8f8f8f8f8f8f8f8f8f8") },
   { $push: { hosts: "Nic Raboy" } }
@@ -540,20 +540,37 @@ db.podcasts.updateOne(
 ```
 
 Use [`$push`](https://www.mongodb.com/docs/manual/reference/operator/update/push/#mongodb-update-up.-push) with the [`$each`](https://www.mongodb.com/docs/manual/reference/operator/update/each/#mongodb-update-up.-each) modifier to append multiple values to the array field.
-```js
+```json
 db.students.updateOne(
    { name: "joe" },
    { $push: { scores: { $each: [ 90, 92, 85 ] } } }
 )
 ```
 
+#### `$addToSet`
+The [`$addToSet`](https://www.mongodb.com/docs/manual/reference/operator/update/addToSet/#mongodb-update-up.-addToSet) operator adds a value to an array unless the value is already present, in which case [`$addToSet`](https://www.mongodb.com/docs/manual/reference/operator/update/addToSet/#mongodb-update-up.-addToSet) does nothing to that array.
+
+##### Syntax:
+```js
+{ $addToSet: { <field1>: <value1>, ... } }
+```
+
+##### Example:
+```js
+db.pigments.updateOne(
+   { _id: 1 },
+   { $addToSet: { colors: "mauve" } }
+)
+```
+
+Use [`$addToSet`](https://www.mongodb.com/docs/manual/reference/operator/update/addToSet/#mongodb-update-up.-addToSet) with the [`$each`](https://www.mongodb.com/docs/manual/reference/operator/update/each/#mongodb-update-up.-each) modifier to append multiple values to the array field.
 
 #### `$inc`
 
 The [`$inc`](https://www.mongodb.com/docs/manual/reference/operator/update/inc/#mongodb-update-up.-inc) operator increments a field by a specified value.
 `{ $inc: { <field1>: <amount1>, <field2>: <amount2>, ... } }`
 
-```js
+```json
 db.products.updateOne(
    { sku: "abc123" },
    { $inc: { quantity: -2, "metrics.orders": 1 } }
@@ -605,7 +622,7 @@ ___
    - The modified document is returned, showing the updated `downloads` field. For instance, if the original value was 6012, the output will display `downloads: 6013`.
 
 6. __Using `upsert`__
-	```js
+	```json
 	db.zips.findAndModify({
 	  query: { zip: 87571 },
 	  update: { $set: { city: "TAOS", state: "NM", pop: 40000 } },
@@ -623,16 +640,16 @@ ___
 
 ___
 
-## **Note**
+#### **Note**
 
 `findAndModify()` is deprecated in MongoDB. MongoDB now recommends using more specialized methods for modifying and querying documents. These alternatives include `findOneAndUpdate()`, `findOneAndDelete()`, and `findOneAndReplace()`. Each of these methods comes with various options to control their behavior. Let's dive into each one with examples.
 
-### 1. `findOneAndUpdate()`
+##### 1. `findOneAndUpdate()`
 
-#### Purpose:
+###### Purpose:
 Updates a single document and returns either the original or the updated document.
 
-#### Syntax:
+###### Syntax:
 ```javascript
 db.collection.findOneAndUpdate(
   filter,
@@ -641,13 +658,13 @@ db.collection.findOneAndUpdate(
 )
 ```
 
-#### Options:
+###### Options:
 - `projection`: Specifies the fields to return in the document.
 - `sort`: Determines which document to modify if the query matches multiple documents.
 - `upsert`: Creates a new document if no documents match the query filter.
 - `returnDocument`: Specifies whether to return the document before or after the update (values: "before" or "after").
 
-#### Example:
+###### Example:
 ```javascript
 db.collection.findOneAndUpdate(
   { name: "Alice" },
@@ -662,12 +679,12 @@ db.collection.findOneAndUpdate(
 ```
 In this example, if no document with `name: "Alice"` exists, it creates one. It returns the document after the update with only the `name` and `age` fields.
 
-### 2. `findOneAndDelete()`
+##### 2. `findOneAndDelete()`
 
-#### Purpose:
+###### Purpose:
 Deletes a single document and returns the deleted document.
 
-#### Syntax:
+###### Syntax:
 ```javascript
 db.collection.findOneAndDelete(
   filter,
@@ -675,11 +692,11 @@ db.collection.findOneAndDelete(
 )
 ```
 
-#### Options:
+###### Options:
 - `projection`: Specifies the fields to return in the document.
 - `sort`: Determines which document to delete if the query matches multiple documents.
 
-#### Example:
+###### Example:
 ```javascript
 db.collection.findOneAndDelete(
   { name: "Bob" },
@@ -691,12 +708,12 @@ db.collection.findOneAndDelete(
 ```
 This example deletes the document where `name: "Bob"`, returns the deleted document with only `name` and `email` fields, and sorts by `age` if there are multiple matches.
 
-### 3. `findOneAndReplace()`
+##### 3. `findOneAndReplace()`
 
-#### Purpose:
+###### Purpose:
 Replaces a single document and returns either the original or the replaced document.
 
-#### Syntax:
+###### Syntax:
 ```javascript
 db.collection.findOneAndReplace(
   filter,
@@ -705,13 +722,13 @@ db.collection.findOneAndReplace(
 )
 ```
 
-#### Options:
+###### Options:
 - `projection`: Specifies the fields to return in the document.
 - `sort`: Determines which document to replace if the query matches multiple documents.
 - `upsert`: Creates a new document if no documents match the query filter.
 - `returnDocument`: Specifies whether to return the document before or after the replacement (values: "before" or "after").
 
-#### Example:
+###### Example:
 ```javascript
 db.collection.findOneAndReplace(
   { name: "Charlie" },
@@ -726,7 +743,7 @@ db.collection.findOneAndReplace(
 ```
 In this example, it replaces the document with `name: "Charlie"` and returns the document after replacement with only the `name` and `city` fields.
 
-### Summary
+#### Summary
 The deprecation of `findAndModify()` in MongoDB has led to clearer, more specific methods for updating, deleting, and replacing documents. These methods (`findOneAndUpdate()`, `findOneAndDelete()`, `findOneAndReplace()`) offer a range of options to control their behavior, making MongoDB operations more efficient and easier to understand.
 
 ___
@@ -780,11 +797,85 @@ ___
 
 ___
 
+### Using Aggregation in Update
+
+Starting with **MongoDB 4.2**, you can use the **aggregation pipeline** in `update` operations (`updateOne`, `updateMany`) and `findAndModify`. This allows for much more complex and dynamic updates compared to the traditional `$set` and `$unset`.
+
+#### Key Benefits of Using Aggregation in Update:
+
+1. **Dynamic Field Values**: You can calculate values dynamically based on existing fields or conditions.
+2. **Field Transformation**: Reshape documents by splitting, merging, or renaming fields.
+3. **Direct Integration of Aggregation Operators**: Use operators like `$add`, `$concat`, `$arrayElemAt`, and more during updates.
+
+---
+
+#### Example Use Cases:
+
+##### **1. Transforming Fields**
+
+Extract nested values and create new fields dynamically:
+
+```javascript
+db.inventory.updateMany(
+  {},
+  [
+    {
+      $set: {
+        height: "$size.h",
+        width: "$size.w"
+      }
+    },
+    {
+      $unset: "size"
+    }
+  ]
+);
+```
+
+##### **2. Conditional Updates**
+
+Set a field value based on a condition:
+
+```javascript
+db.inventory.updateMany(
+  {},
+  [
+    {
+      $set: {
+        category: {
+          $cond: { if: { $gt: ["$qty", 50] }, then: "Bulk", else: "Standard" }
+        }
+      }
+    }
+  ]
+);
+```
+
+##### **3. Incrementing Fields Dynamically**
+
+Update a field based on its existing value:
+
+```javascript
+db.inventory.updateMany(
+  {},
+  [
+    {
+      $set: {
+        qty: { $add: ["$qty", 10] }
+      }
+    }
+  ]
+);
+```
+
+
+___
+
 ### Lesson 05: Deleting Documents in MongoDB
 
 To delete documents, use the `deleteOne()` or `deleteMany()` methods. Both methods accept a filter document and an options object.
 
-## Delete One Document
+#### Delete One Document
 
 The following code shows an example of the `deleteOne()` method:
 
@@ -792,7 +883,7 @@ The following code shows an example of the `deleteOne()` method:
 db.podcasts.deleteOne({ _id: Objectid("6282c9862acb966e76bbf20a") })
 ```
 
-## Delete Many Documents
+#### Delete Many Documents
 
 The following code shows an example of the `deleteMany()` method:
 
@@ -983,7 +1074,7 @@ ___
 
 Review the following code, which demonstrates how to count the number of documents that match a query.
 
-## Count Documents
+#### Count Documents
 
 Use `db.collection.countDocuments()` to count the number of documents that match a query. `countDocuments()` takes two parameters: a query document and an options document.
 
@@ -1065,7 +1156,7 @@ ___
 
 Review the following sections, which show the code for the `$match` and `$group` aggregation stages.
 
-## [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/02-match-and-group/lesson-text/2-lesson-text.md#match)`$match`
+#### [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/02-match-and-group/lesson-text/2-lesson-text.md#match)`$match`
 
 The `$match` stage filters for documents that match specified conditions. Here's the code for `$match`:
 
@@ -1079,7 +1170,7 @@ The `$match` stage filters for documents that match specified conditions. Here
 
 - **Argument**: Takes a query, functioning the same way as a `find` command.
 - **Optimization Tip**: Place `$match` early in the pipeline to leverage indexes, reducing the number of documents and improving performance.
-## [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/02-match-and-group/lesson-text/2-lesson-text.md#group)`$group`
+#### [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/02-match-and-group/lesson-text/2-lesson-text.md#group)`$group`
 
 The `$group` stage groups documents by a group key.
 
@@ -1097,7 +1188,7 @@ The `$group` stage groups documents by a group key.
 - **Group Key** (`_id`): Defines how documents are grouped.
 - **Accumulators**: An expression that specifies how to aggregate information for each of the groups. For example:
     - `$count` for counting documents within each group.
-## [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/02-match-and-group/lesson-text/2-lesson-text.md#match-and-group-in-an-aggregation-pipeline)`$match` and `$group` in an Aggregation Pipeline
+#### [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/02-match-and-group/lesson-text/2-lesson-text.md#match-and-group-in-an-aggregation-pipeline)`$match` and `$group` in an Aggregation Pipeline
 
 The following aggregation pipeline finds the documents with a field named "state" that matches a value "CA" and then groups those documents by the group key "$city" and shows the total number of zip codes in the state of California.
 
@@ -1117,12 +1208,70 @@ db.zips.aggregate([
 ])
 ```
 
+#### `$expr`
+
+##### **What is `$expr`?**
+
+- `$expr` allows you to include aggregation expressions in a regular query (`find` or `$match`).
+- It’s useful when you need to compare fields within the same document or apply operations usually restricted to aggregation stages.
+
+##### **When to Use `$expr`**
+
+- When a query needs to evaluate conditions using fields or computed values dynamically.
+- For example:
+    - Comparing two fields in a document.
+    - Using aggregation operators (e.g., `$avg`, `$add`, `$gt`, etc.) in a query.
+
+##### **Syntax of `$expr`**
+
+```javascript
+{
+  $expr: {
+    <operator>: [ <expression1>, <expression2>, ... ]
+  }
+}
+```
+
+- `<operator>`: Any MongoDB comparison or logical operator (e.g., `$gt`, `$lt`, `$eq`, `$and`).
+- `<expression>`: Fields, constants, or other operators.
+
+---
+
+##### **Example 1: Comparing Fields in a Document**
+
+Find documents where the `stock` is less than the `price`:
+
+```javascript
+db.products.find({
+  $expr: { $lt: ["$stock", "$price"] }
+});
+```
+
+##### **Example 2: Using Aggregation Operators**
+
+Find products where the average rating is greater than 4.5:
+
+```javascript
+db.products.aggregate([
+  {
+    $match: {
+      $expr: { $gt: [{ $avg: "$ratings" }, 4.5] }
+    }
+  }
+]);
+```
+
+##### **Key Points**:
+
+- `$expr` can be used inside `$match` for both aggregation and `find`.
+- It eliminates the need for precomputed fields like `averageRating` unless necessary for frequent queries.
+
 ___
 ### Lesson 3:  Using `$sort` and `$limit` Stages in a MongoDB Aggregation Pipeline
 
 Review the following sections, which show the code for the `$sort` and `$limit` aggregation stages.
 
-## [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/03-sort-and-limit/lesson-text/3-lesson-text.md#sort)`$sort`
+#### [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/03-sort-and-limit/lesson-text/3-lesson-text.md#sort)`$sort`
 
 The `$sort` stage sorts all input documents and returns them to the pipeline in sorted order. We use 1 to represent ascending order, and -1 to represent descending order.
 
@@ -1136,7 +1285,7 @@ The `$sort` stage sorts all input documents and returns them to the pipeline i
 
   
 
-## [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/03-sort-and-limit/lesson-text/3-lesson-text.md#limit)`$limit`
+#### [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/03-sort-and-limit/lesson-text/3-lesson-text.md#limit)`$limit`
 
 The `$limit` stage returns only a specified number of records.
 
@@ -1148,7 +1297,7 @@ The `$limit` stage returns only a specified number of records.
 
   
 
-## [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/03-sort-and-limit/lesson-text/3-lesson-text.md#sort-and-limit-in-an-aggregation-pipeline)`$sort` and `$limit` in an Aggregation Pipeline
+#### [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/03-sort-and-limit/lesson-text/3-lesson-text.md#sort-and-limit-in-an-aggregation-pipeline)`$sort` and `$limit` in an Aggregation Pipeline
 
 The following aggregation pipeline sorts the documents in descending order, so the documents with the greatest `pop` value appear first, and limits the output to only the first five documents after sorting.
 
@@ -1171,14 +1320,14 @@ ___
 
 Review the following sections, which show the code for the `$project`, `$set`, and `$count` aggregation stages.
 
-## [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/04-project-count-set/lesson-text/4-lesson-text.md#project)`$project`
+#### [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/04-project-count-set/lesson-text/4-lesson-text.md#project)`$project`
 
 The `$project` stage specifies the fields of the output documents. 1 means that the field should be included, and 0 means that the field should be supressed. The field can also be assigned a new value.
 
 It should be the last stage to format the output
 MongoDB already works out which fields are needed and reads only the fields that are required in the pipeline, so there's usually no reason to use project earlier in the pipeline
 
-![Pasted image 20241107032511.png](assets/Pasted%20image%2020241107032511.png)
+![Alt text](assets/Pasted%20image%2020241107032511.png)
 
 ```js
 {
@@ -1191,7 +1340,7 @@ MongoDB already works out which fields are needed and reads only the fields that
 }
 ```
 
-## [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/04-project-count-set/lesson-text/4-lesson-text.md#set)`$set`
+#### [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/04-project-count-set/lesson-text/4-lesson-text.md#set)`$set`
 
 The `$set` stage creates new fields or changes the value of existing fields, and then outputs the documents with the new fields.
 
@@ -1219,7 +1368,7 @@ The `$set` stage creates new fields or changes the value of existing fields, a
 ```
 
 
-## [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/04-project-count-set/lesson-text/4-lesson-text.md#count)`$count`
+#### [](https://github.com/10gen/curriculum/blob/develop/Application-Developer/07-Aggregation/Lessons/04-project-count-set/lesson-text/4-lesson-text.md#count)`$count`
 
 The `$count` stage creates a new document, with the number of documents at that stage in the aggregation pipeline assigned to the specified field name.
 
@@ -1314,14 +1463,14 @@ ___
    - **Performance Improvement**: 
      - Reduces the need for **collection scans** (reading each document to match queries).
      - Supports **equality and range-based queries**, allowing for faster lookups and sorted outputs.
- ![Screenshot (66).png](assets/Screenshot%20(66).png)
+ ![Alt text](assets/Screenshot%20(66).png)
  
    - **Efficiency Gains**:
      - Lowers **disk I/O** and **resource usage**.
      - Avoids reading full documents if the index covers all query fields.
 
-![Screenshot (99).png](assets/Screenshot%20(99).png)
-![Screenshot (100).png](assets/Screenshot%20(100).png)
+![Alt text](assets/Screenshot%20(99).png)
+![Alt text](assets/Screenshot%20(100).png)
 
 #### **2. Default and Additional Indexes**
    - **Default Index**: Every collection has a default index on the `_id` field.
@@ -1341,8 +1490,8 @@ ___
    - **Example Scenario**: Searching for customers who are `active` and have a specific `account`.
    - **Solution**: A **compound index** on `active` and `accounts` fields will improve query speed.
    - Since `accounts` is an array field, this index is a **multikey compound index**.
-	![Screenshot (105).png](assets/Screenshot%20(105).png)
-	![Screenshot (106).png](assets/Screenshot%20(106).png)
+	![Alt text](assets/Screenshot%20(105).png)
+	![Alt text](assets/Screenshot%20(106).png)
 #### **Recap**
    - Indexes store ordered fields from a collection to support faster data retrieval, equality, and range-based operations, and they allow sorting without reading all documents.
    - **Types**: Single-field, compound, and multikey indexes.
@@ -1391,7 +1540,7 @@ ___
      ```javascript
      db.customers.find({ birthdate: { $gt: ISODate("1995-08-01") } }).explain();
      ```
-     ![Screenshot (107).png](assets/Screenshot%20(107).png)
+     ![Alt text](assets/Screenshot%20(107).png)
    - **Understanding the Query Plan**:
     - **Winning Plan**: This section of the `explain` output shows the most efficient way MongoDB executes the query.
     - A `winningPlan` is a document that contains information about the query and the method that was used to execute the query.
@@ -1413,15 +1562,15 @@ ___
 db.customers.find({birthdate: {$lt: ISODate("1966-08-01")}}).sort({email: 1}).explain()
 		```
 		   
-	    ![Screenshot (109).png](assets/Screenshot%20(109).png)
-	    ![Screenshot (111).png](assets/Screenshot%20(111).png)
+	    ![Alt text](assets/Screenshot%20(109).png)
+	    ![Alt text](assets/Screenshot%20(111).png)
      - **Optimization Tip**: Creating a compound index on `birthdate` and `email` would allow MongoDB to optimize both the filter and the sort, improving query performance.
      - The query optimizer considered using email_1 index, which would support the sort but not the query filter, but it was rejected
      
 	    ```js
     db.customers.explain().find({accounts: 871666})
 	```
-![Pasted image 20241109174430.png](assets/Pasted%20image%2020241109174430.png)
+![Alt text](assets/Pasted%20image%2020241109174430.png)
 The `winningPlan` is a collection scan `COLLSCAN` because there are no indexes that can be used for the accounts field
 #### **6. Collection Scans and Index Creation Needs**
    - **Collection Scan**: If no index is available, MongoDB performs a full scan on the collection, which is slower.
@@ -1472,7 +1621,7 @@ ___
        ```javascript
        db.customers.find({ accounts: 627788 }).explain();
        ```
-       ![Pasted image 20241109181106.png](assets/Pasted%20image%2020241109181106.png)
+       ![Alt text](assets/Pasted%20image%2020241109181106.png)
    - **Index Scan (IXSCAN)**: When the index is used, the `IXSCAN` stage appears in the `winningPlan`, showing that MongoDB scans the index for matching values.
    - **Fetch Stage**: After identifying relevant documents with `IXSCAN`, MongoDB typically performs a `FETCH` stage to retrieve the complete documents, as each array value is stored as a separate index entry. (multikey indexes need to fetch the documents after the IXSCAN stage because the index entries have each of the array values stored separately)
 
@@ -1504,9 +1653,9 @@ ___
 - **Recommended Order** ([The ESR (Equality, Sort, Range) Rule](https://www.mongodb.com/docs/manual/tutorial/equality-sort-range-rule/#the-esr--equality--sort--range--rule "Permalink to this heading")):
 	- The recommended order of indexed fields in a compound index is Equality, Sort, and Range. Optimized queries use the first field in the index, Equality, to determine which documents match the query. The second field in the index, Sort, is used to determine the order of the documents. The third field, Range, is used to determine which documents to include in the result set.
     1. **Equality Filters**: Fields tested for equality (`field = value`) should appear first.
-		![Screenshot (119).png](assets/Screenshot%20(119).png)
+		![Alt text](assets/Screenshot%20(119).png)
     2. **Sort Fields**: Fields used for sorting come next, following the query's sort order.
-	    ![Screenshot (121).png](assets/Screenshot%20(121).png)
+	    ![Alt text](assets/Screenshot%20(121).png)
     3. **Range Filters**: Fields used in range queries (`>=`, `<=`, etc.) should come last.
 	
 	In general, it's recommended that range and sort should be placed after equality in the index to avoid in-memory sort or filtering.
@@ -1566,7 +1715,7 @@ db.customers.createIndex({ active: 1, birthdate: -1, name: 1 });
 		- PROJECTION_COVERED - All the information needed is returned by the index, no need to fetch from memory
 
 - If a query projects additional fields that we don't use to filter or sort by, we can include those fields at the end of the field list when we create the index. This way we use the index to cover the query and avoid fetching the documents.
-	![Pasted image 20241121200357.png](assets/Pasted%20image%2020241121200357.png)
+	![Alt text](assets/Pasted%20image%2020241121200357.png)
 
 ---
 
@@ -1608,7 +1757,7 @@ Compound indexes support sort operations that match either the sort order of the
 db.leaderboard.find().sort( { score: 1, username: -1 } )
 ```
 
-### Unsupported Queries
+#### Unsupported Queries
 
 Compound indexes cannot support queries where the sort order does not match the index or the reverse of the index. As a result, the `{ score: -1, username: 1 }` index **cannot** support sorting by ascending `score` values and then by ascending `username` values, such as this query:
 
@@ -1635,9 +1784,9 @@ ___
 
 ___
 
-A summary of the key points about MongoDB index usage for sorting and filtering, along with examples:
+#### A summary of the key points about MongoDB index usage for sorting and filtering, along with examples:
 
-### Key Points
+##### Key Points
 
 1. **Index Usage for Sorting**:
     
@@ -1654,9 +1803,9 @@ A summary of the key points about MongoDB index usage for sorting and filtering,
     - Place `$match` at the beginning of the pipeline to leverage indexes.
     - `$match` followed by `$sort` at the start of the pipeline can use an index efficiently.
 
-### Examples
+##### Examples
 
-#### Example 1: Index Usage for Sorting
+###### Example 1: Index Usage for Sorting
 
 Consider an index on the `data` collection:
 
@@ -1679,7 +1828,7 @@ db.data.createIndex({ a: 1, b: 1, c: 1, d: 1 })
     
     - The query does not include an equality condition on `a` and does not include any condition on `b`, which are the prefix keys preceding the sort key `c`. MongoDB cannot use the index efficiently for sorting.
 
-#### Example 2: Range Filters and Sorting
+###### Example 2: Range Filters and Sorting
 
 Consider an index on the `cars` collection:
 
@@ -1702,7 +1851,7 @@ db.cars.createIndex({ price: 1, model: 1 })
     
     - MongoDB can use the index to sort the documents by `model` first and then apply the range filter on `price`, resulting in a non-blocking sort operation.
 
-#### Example 3: Order of Equality Matches
+###### Example 3: Order of Equality Matches
 
 Consider the following index on the `data` collection:
 
@@ -1725,7 +1874,7 @@ db.data.createIndex({ a: 1, b: 1, c: 1, d: 1 })
     
     - Even though the order of `a` and `b` is reversed in the query, MongoDB can still use the index efficiently because all equality matches (`a` and `b`) come before the sort key (`c`).
 
-#### Example 4: Aggregation Pipeline Optimization
+###### Example 4: Aggregation Pipeline Optimization
 
 Consider a collection `sales` with the following documents:
 
@@ -1733,7 +1882,7 @@ Consider a collection `sales` with the following documents:
 db.sales.insertMany([  { _id: 0, items: [{ item_id: 43, quantity: 2, price: 10, name: "pen" }, { item_id: 2, quantity: 1, price: 240, name: "briefcase" }] },  { _id: 1, items: [{ item_id: 23, quantity: 3, price: 110, name: "notebook" }, { item_id: 103, quantity: 4, price: 5, name: "pen" }, { item_id: 38, quantity: 1
 ```
 
-## Example
+#### Example
 
 The following query searches the `cars` collection for vehicles manufactured by Ford that cost more than $15,000 dollars. The results are sorted by model:
 
@@ -1887,19 +2036,19 @@ ___
 
 ### Lesson 1: Using Relevance-Based Search and Search Indexes
 
-### **Introduction to Atlas Search**
+#### **Introduction to Atlas Search**
 
 Atlas Search is a powerful, relevance-based search tool built directly into MongoDB Atlas. Unlike traditional database searches that focus on exact matches, Atlas Search enables users to retrieve records ranked by relevance to a search term. This eliminates the need for separate search software, simplifying development and reducing system complexity.
 
 ---
 
-### **Use Cases for Atlas Search**
+#### **Use Cases for Atlas Search**
 
 Atlas Search is ideal for applications where users need to find information based on vague or broad search terms. For example, searching for "Atlas Search" in MongoDB documentation retrieves results ranked by their relevance to the term. Such functionality is critical for applications prioritizing user-centric search experiences.
 
 ---
 
-### **Key Differences: Database Search vs. Relevance-Based Search**
+#### **Key Differences: Database Search vs. Relevance-Based Search**
 
 - **Database Search**:
     - Used by developers or database administrators.
@@ -1913,7 +2062,7 @@ Atlas Search is ideal for applications where users need to find information base
 
 ---
 
-### **Challenges with Search in Applications**
+#### **Challenges with Search in Applications**
 
 Building relevance-based search functionality in applications is challenging because it requires:
 
@@ -1925,7 +2074,7 @@ Building relevance-based search functionality in applications is challenging bec
 
 ---
 
-### **Search Index vs. Database Index**
+#### **Search Index vs. Database Index**
 
 1. **Database Index**:
     - Speeds up frequent database queries by efficiently locating specific records.
@@ -1936,7 +2085,7 @@ Building relevance-based search functionality in applications is challenging bec
 
 ---
 
-### **Components of an Atlas Search Index**
+#### **Components of an Atlas Search Index**
 
 1. **Analyzers**:
     - Determine how text is processed (e.g., tokenizing text into searchable units).
@@ -1950,7 +2099,7 @@ Building relevance-based search functionality in applications is challenging bec
 
 ---
 
-### **Key Takeaways**
+#### **Key Takeaways**
 
 1. **When to Use Atlas Search**:
     - When your application needs advanced, relevance-based search capabilities.
@@ -1965,26 +2114,26 @@ Building relevance-based search functionality in applications is challenging bec
 
 ---
 
-### **Conclusion**
+#### **Conclusion**
 
 Atlas Search integrates relevance-based search seamlessly into MongoDB Atlas, leveraging Apache Lucene to enhance user experience. By understanding the differences between relevance-based and database searches and configuring search indexes effectively, developers can build applications with robust, intuitive search functionality.
 
 ___
 
 ### Lesson 2: Creating a Search Index with Dynamic Mapping
-### **Creating a Search Index with MongoDB Atlas**
+#### **Creating a Search Index with MongoDB Atlas**
 
 In this lesson, we will walk through the process of creating a **search index** in MongoDB Atlas, using **dynamic mapping** to allow for quick and efficient relevance-based searches. By the end, we’ll query the data and explore the results to see how the search index works in action.
 
 ---
 
-### **Search Index Overview**
+#### **Search Index Overview**
 
 A **search index** defines how a relevance-based search should be performed on your data. It is different from a database index, which is used to optimize database queries.
 
 ---
 
-### **Steps to Create a Search Index**
+#### **Steps to Create a Search Index**
 
 1. **Access the Search Tab**:
     - In the MongoDB Atlas interface, navigate to the **Search tab**.
@@ -2007,14 +2156,14 @@ A **search index** defines how a relevance-based search should be performed on y
         
         > _Note: Index creation may take some time, and you’ll be notified once it’s ready._
      
-![Pasted image 20241122190611.png](assets/Pasted%20image%2020241122190611.png)
+![Alt text](assets/Pasted%20image%2020241122190611.png)
 
 
 
 
 ---
 
-### **Running a Query**
+#### **Running a Query**
 
 Once the search index is created, you can run a query to test its functionality:
 
@@ -2028,7 +2177,7 @@ Once the search index is created, you can run a query to test its functionality:
 
 ---
 
-### **Advanced Features**
+#### **Advanced Features**
 
 As you advance with Atlas Search, you can:
 - **Adjust Scoring**: Assign weights to specific fields, making certain fields more influential in the relevance calculation.
@@ -2036,7 +2185,7 @@ As you advance with Atlas Search, you can:
 
 ---
 
-### **Key Takeaways**
+#### **Key Takeaways**
 
 1. **Dynamic Mapping**:
     - Indexes all fields automatically, making it the fastest way to set up a search index.
@@ -2047,7 +2196,7 @@ As you advance with Atlas Search, you can:
 
 ---
 
-### **Conclusion**
+#### **Conclusion**
 
 You’ve successfully created your first search index with dynamic mapping, queried data, and understood how relevance scoring works. With this foundation, you can now explore Atlas Search further by experimenting with custom configurations, analyzers, and field mappings to build advanced search functionalities for your applications.
 
@@ -2056,7 +2205,7 @@ Start by creating a search index on your own dataset and testing it with real qu
 ___
 #### **The Lab**
 
-```js
+```json
 {
     "name": "sample_supplies-sales-dynamic",
     "searchAnalyzer": "lucene.standard",
@@ -2135,13 +2284,13 @@ ___
 
 ### Lesson 3: Creating a Search Index with Static Field Mapping
 
-### **Using Static Mapping for Atlas Search**
+#### **Using Static Mapping for Atlas Search**
 
 In this lesson, we will learn how to use **static mapping** for Atlas Search to optimize search performance by indexing only specific fields. While the default **dynamic mapping** indexes all fields, static mapping focuses on the fields most relevant to the application’s users, improving efficiency and accuracy.[]()
 
 ---
 
-### **What is Static Mapping?**
+#### **What is Static Mapping?**
 
 - **Dynamic Mapping**: Automatically indexes all fields in a collection.
     - Great for quick setup but can be resource-intensive for collections with many fields.
@@ -2151,7 +2300,7 @@ In this lesson, we will learn how to use **static mapping** for Atlas Search to 
 
 ---
 
-### **When to Use Static Mapping**
+#### **When to Use Static Mapping**
 
 Static mapping is useful when:
 
@@ -2161,7 +2310,7 @@ Static mapping is useful when:
 
 ---
 
-### **Steps to Create a Static Search Index**
+#### **Steps to Create a Static Search Index**
 
 1. **Access the Search Tab**:
     
@@ -2172,10 +2321,10 @@ Static mapping is useful when:
         Example: The **birds** collection in the **bird guide** database.
 3. **Configure Field Mappings**:
 	Let's imagine we're creating a bird guidebook application. In this case, the most important fields that contain information that our user might search by are common name, scientific name, habitat, and diet. Dynamic mapping indexes all of the fields present in a collection. In order to save time and processing power, we'll toggle off dynamic mapping and only index the fields that we anticipate will contain the search terms that our end user might query
-	![Pasted image 20241124130545.png](assets/Pasted%20image%2020241124130545.png)
-	![Pasted image 20241124130549.png](assets/Pasted%20image%2020241124130549.png)
+	![Alt text](assets/Pasted%20image%2020241124130545.png)
+	![Alt text](assets/Pasted%20image%2020241124130549.png)
     - Toggle **off** dynamic mapping to disable automatic indexing of all fields.
-	     ![Pasted image 20241124130646.png](assets/Pasted%20image%2020241124130646.png)
+	     ![Alt text](assets/Pasted%20image%2020241124130646.png)
     - Use the **Add Field** option to manually select specific fields to index.
         - Example: For a bird guide application, select fields like:
             - `common name`
@@ -2193,7 +2342,7 @@ Static mapping is useful when:
 
 ---
 
-### **Testing the Static Search Index**
+#### **Testing the Static Search Index**
 
 1. **Run a Query**:
     
@@ -2206,7 +2355,7 @@ Static mapping is useful when:
 
 ---
 
-### **Advantages of Static Mapping**
+#### **Advantages of Static Mapping**
 
 - **Efficiency**: Reduces resource consumption by focusing only on relevant fields.
 - **Precision**: Improves the quality of search results by limiting indexing to fields users care about.
@@ -2214,7 +2363,7 @@ Static mapping is useful when:
 
 ---
 
-### **Key Takeaways**
+#### **Key Takeaways**
 
 - **Static Mapping**:
     - Best for collections with many fields where only a subset is relevant to the user.
@@ -2226,7 +2375,7 @@ Static mapping is useful when:
 
 ---
 
-### **Conclusion**
+#### **Conclusion**
 
 Static mapping in Atlas Search empowers developers to create targeted, efficient search experiences by focusing on the most relevant fields. By understanding how to configure and use static mappings, you can deliver optimized search functionality tailored to your application’s needs.
 
@@ -2234,10 +2383,10 @@ Try creating a static search index for your own data and see how it enhances bot
 
 ___
 
-**The Lab**
+#### **The Lab**
 We have a dataset that contains records from an office supply company. The records contain information about orders, products, and customers. Imagine we are working on an application with a dashboard for administrators keeping track of sales at our office supply company. We want to add search functionality so that administrators can easily find sales matching their criteria. First we need to create a search index for the `sales` collection!
 
-```js
+```json
 {
     "name": "sample_supplies-sales-static",
     "searchAnalyzer": "lucene.standard",
@@ -2255,7 +2404,7 @@ We have a dataset that contains records from an office supply company. The recor
 }
 ```
 
-## Lab Instructions
+#### Lab Instructions
 
 You will be connected to your Atlas cluster and to the `sample_supplies` database. Use the `sales` collection in this lab.
 
@@ -2276,7 +2425,7 @@ You will be connected to your Atlas cluster and to the `sample_supplies` datab
 
 The following code is a snippet from a search index. What type of field mapping does this search index use? (Select one.)
 
-```js
+```json
 {
     "mappings": {
         "dynamic": false,
@@ -2295,7 +2444,7 @@ The following code is a snippet from a search index. What type of field mapping 
 }
 ```
 
-![Pasted image 20241124132455.png](assets/Pasted%20image%2020241124132455.png)
+![Alt text](assets/Pasted%20image%2020241124132455.png)
 
 ___
 
@@ -2309,7 +2458,7 @@ The `$compound` operator within the `$search` aggregation stage allows us to giv
 
 ---
 
-### **Steps to Implement a `$compound` Operator**
+#### **Steps to Implement a `$compound` Operator**
 
 1. **Create a Search Index**:
     - Ensure a search index (e.g., dynamic mapping) is already configured.
@@ -2322,20 +2471,20 @@ The `$compound` operator within the `$search` aggregation stage allows us to giv
 
 ---
 
-### **Example: Bird Search Application**
+#### **Example: Bird Search Application**
 
 Let’s create an application for bird enthusiasts where users can search for birds commonly found in **grasslands** with a **wingspan greater than 75 cm**.
 
-#### **Logic**:
+##### **Logic**:
 
 - Results **must** include birds inhabiting grasslands.
 - Results **should** prioritize birds with a wingspan greater than 75 cm by assigning a higher score.
 
-#### **Pipeline Configuration**:
+##### **Pipeline Configuration**:
 
 Here’s how the pipeline might look:
 
-```js
+```json
 {
   "$search": {
     "index": "default",
@@ -2364,7 +2513,7 @@ Here’s how the pipeline might look:
 
 ---
 
-### **Testing and Results**
+#### **Testing and Results**
 
 - **Execute the Query**:
     - Run the pipeline in the **Aggregation Pipeline Tester** in MongoDB Atlas.
@@ -2373,7 +2522,7 @@ Here’s how the pipeline might look:
     - Birds inhabiting grasslands and having a wingspan > 75 cm receive the highest scores.
     - The `boost` value of 5 increases the priority of the wingspan condition in ranking.
 
-#### **Example Output**
+##### **Example Output**
 
 - **Bird A**: Grasslands, wingspan 80 cm → High score.
 - **Bird B**: Grasslands, wingspan 70 cm → Lower score.
@@ -2381,7 +2530,7 @@ Here’s how the pipeline might look:
 
 ---
 
-### **Advantages of Field Weighting with `$compound`**
+#### **Advantages of Field Weighting with `$compound`**
 
 1. **Customization**:
     - Tailor search results to user preferences or application needs.
@@ -2392,7 +2541,7 @@ Here’s how the pipeline might look:
 
 ---
 
-### **Key Takeaways**
+#### **Key Takeaways**
 
 - The `$compound` operator in Atlas Search enables advanced search customization through weighted clauses.
 - By combining `must`, `mustNot`, `should`, and `filter` clauses, you can design search experiences that prioritize the most relevant results.
@@ -2400,13 +2549,13 @@ Here’s how the pipeline might look:
 
 ---
 
-### **Next Steps**
+#### **Next Steps**
 
 Try implementing a `$compound` operator in your own database! Experiment with different clauses and scoring strategies to see how it transforms your search capabilities. With MongoDB’s powerful tools, you can create truly dynamic and intuitive search functionalities tailored to your application's users.
 
 ___
 
-## A summary for `$search` stage from ChatGPT
+### A summary for `$search` stage from ChatGPT
 
 The `$search` stage in MongoDB’s **Atlas Search** is a powerful feature used to implement advanced search capabilities. It allows you to search text, numeric, and other types of data within documents, with functionality such as fuzzy matching, ranking, and custom scoring.
 
@@ -2414,7 +2563,7 @@ Here's a deep dive into the `$search` stage, including key components, operators
 
 ---
 
-### **Key Components of `$search`**
+#### **Key Components of `$search`**
 
 1. **`index`**
     
@@ -2519,9 +2668,9 @@ Here's a deep dive into the `$search` stage, including key components, operators
 
 ---
 
-### **Detailed Examples**
+#### **Detailed Examples**
 
-#### **1. Simple Text Search**
+##### **1. Simple Text Search**
 
 Search for documents where the `name` field contains "pizza".
 
@@ -2542,7 +2691,7 @@ db.collection.aggregate([
 
 ---
 
-#### **2. Fuzzy Text Search**
+##### **2. Fuzzy Text Search**
 
 Search for names similar to "pizza" with a maximum of 2 character edits.
 
@@ -2566,7 +2715,7 @@ db.collection.aggregate([
 
 ---
 
-#### **3. Using Multiple Fields**
+##### **3. Using Multiple Fields**
 
 Search for a query in multiple fields, such as `name` and `categories`.
 
@@ -2587,7 +2736,7 @@ db.collection.aggregate([
 
 ---
 
-#### **4. Combining Queries with `compound`**
+##### **4. Combining Queries with `compound`**
 
 Search for documents that meet multiple criteria.
 
@@ -2615,7 +2764,7 @@ db.collection.aggregate([
 
 ---
 
-#### **5. Autocomplete Search**
+##### **5. Autocomplete Search**
 
 Implement a type-ahead search for restaurant names.
 
@@ -2637,7 +2786,7 @@ db.collection.aggregate([
 
 ---
 
-#### **6. Sorting Results**
+##### **6. Sorting Results**
 
 Sort results by relevance and add additional sorting criteria.
 
@@ -2659,7 +2808,7 @@ db.collection.aggregate([
 
 ---
 
-#### **7. Highlighting Matched Text**
+##### **7. Highlighting Matched Text**
 
 Highlight matches in the `name` field.
 
@@ -2683,7 +2832,7 @@ db.collection.aggregate([
 
 ---
 
-### **When to Use `$search`**
+#### **When to Use `$search`**
 
 - **Full-text search**: When you need to search textual data with relevance scoring.
 - **Typo handling**: To account for user input errors.
@@ -2693,7 +2842,7 @@ db.collection.aggregate([
 
 ---
 
-### **Comparison with Standard MongoDB Queries**
+#### **Comparison with Standard MongoDB Queries**
 
 |Feature|`$search`|Standard MongoDB Queries|
 |---|---|---|
@@ -2706,25 +2855,25 @@ db.collection.aggregate([
 ___
 
 ### Lesson 5: Group Search Results by Using Facets
-### **Using Facets and `$searchMeta` for Categorized Search Results**
+#### **Using Facets and `$searchMeta` for Categorized Search Results**
 
 In this lesson, we learn how to use **facets** and the **`$searchMeta` stage** in MongoDB Atlas to categorize search results, enhancing usability and search experience for end users.
 
 ---
 
-### **What are Facets?**
+#### **What are Facets?**
 
 Facets are **buckets** that group search results into categories, helping users navigate and find relevant data more efficiently. For example, in a social media app, search results can be categorized into **people**, **posts**, **events**, etc.
 
-#### **Example Use Case**:
+##### **Example Use Case**:
 
 For a bird sighting application, we might categorize search results by the **week of sighting** to help users identify patterns in bird sightings.
 
 ---
 
-### **Steps to Implement Faceted Search**
+#### **Steps to Implement Faceted Search**
 
-#### **1. Prepare the Search Index**
+##### **1. Prepare the Search Index**
 
 - **Field Mapping**:
     - Identify the fields to use for categorization (e.g., date, numbers, or strings).
@@ -2735,7 +2884,7 @@ For a bird sighting application, we might categorize search results by the **wee
 
 ---
 
-#### **2. Use the `$searchMeta` Aggregation Stage**
+##### **2. Use the `$searchMeta` Aggregation Stage**
 
 The `$searchMeta` stage provides metadata about search results, including:
 
@@ -2745,11 +2894,11 @@ The `$searchMeta` stage provides metadata about search results, including:
 
 ---
 
-#### **3. Configure the `$searchMeta` Query**
+##### **3. Configure the `$searchMeta` Query**
 
 Below is an example query to group bird sightings by **weeks**:
 
-```js
+```json
 {
   "$searchMeta": {
     "index": "default",
@@ -2777,7 +2926,7 @@ Below is an example query to group bird sightings by **weeks**:
 }
 ```
 
-#### **Explanation**:
+##### **Explanation**:
 
 - **Facets Definition**:
     
@@ -2791,7 +2940,7 @@ Below is an example query to group bird sightings by **weeks**:
 
 ---
 
-#### **4. Results**
+##### **4. Results**
 
 The query generates metadata with categorized results:
 
@@ -2801,7 +2950,7 @@ The query generates metadata with categorized results:
 
 ---
 
-### **Advantages of Faceted Search**
+#### **Advantages of Faceted Search**
 
 1. **Improved User Experience**:
     - Users can quickly narrow down results based on categories.
@@ -2812,7 +2961,7 @@ The query generates metadata with categorized results:
 
 ---
 
-### **Key Takeaways**
+#### **Key Takeaways**
 
 - Faceted search categorizes results into buckets, improving search usability.
 - The `$searchMeta` stage provides metadata for grouping results without affecting the search results themselves.
@@ -2820,24 +2969,24 @@ The query generates metadata with categorized results:
 
 ---
 
-### **Next Steps**
+#### **Next Steps**
 
 - Experiment with different facets in your application, such as price ranges, locations, or tags.
 - Use MongoDB Atlas documentation to explore driver-specific implementations for integrating `$searchMeta` and facets into your code.
 
 ___
 
-### **The Lab**
+#### **The Lab**
 
 We have a dataset that contains records from an office supply company. The records contain information about orders, products, and customers. Imagine we are working on an application with a dashboard for administrators keeping track of sales at our office supply company. We want to add search functionality so that administrators can easily find sales matching their criteria. The administrators like to look at the sales by store and would like to organize search results by the store's location. We can accomplish that using facets!
 
-## Lab Instructions
+##### Lab Instructions
 
 1. Open the `search_index.json` file in the [editor](https://play.instruqt.com/embed/mongodb/tracks/grouping-search-results-by-using-facets/challenges/creating-a-search-index-with-dynamic-mapping/assignment#tab-0) tab by clicking the file name in the file explorer to the left.
     
 2. Edit the JSON file in the IDE as follows: changing the value for the second field 'type' for 'purchaseMethod' in 'fields' to `string` and change the second field 'type' for 'storeLocation' to `stringFacet` to reflect the sample below.
 
-```js
+```json
 {
     "name": "sample_supplies-sales-facets",
     "searchAnalyzer": "lucene.standard",
@@ -2899,7 +3048,7 @@ db.sales.aggregate([{$searchMeta: {index: 'sample_supplies-sales-facets'}, 'face
 
 ___
 
-# MongoDB Atlas Search
+### MongoDB Atlas Search
 
 Congratulations on learning about Atlas Search, an incredibly powerful tool for adding search functionality to your apps. In this unit, we covered the basics of Atlas Search, including the following:
 - What a search index is.
@@ -2915,13 +3064,13 @@ ___
 ## Unit 11 : MongoDB Data Modeling Intro
 ### Lesson 1: Introduction to Data Modeling
 
-### **Understanding Data Modeling in MongoDB**
+#### **Understanding Data Modeling in MongoDB**
 
 This lesson introduces the concept of **data modeling** and explores how it is implemented in MongoDB compared to traditional relational databases. It highlights the advantages of MongoDB's flexible document model and how to approach data modeling effectively.
 
 ---
 
-### **What is Data Modeling?**
+#### **What is Data Modeling?**
 
 Data modeling is the process of defining:
 
@@ -2932,7 +3081,7 @@ The structure or organization of this data within a database is called a **schem
 
 ---
 
-### **Key Questions for Data Modeling**
+#### **Key Questions for Data Modeling**
 
 When designing a schema in MongoDB, focus on the application rather than the database. Consider:
 1. **What does my application do?**
@@ -2947,7 +3096,7 @@ Answering these questions helps identify:
 
 ---
 
-### **Why is Proper Data Modeling Important?**
+#### **Why is Proper Data Modeling Important?**
 
 A good data model:
 - **Simplifies data management**.
@@ -2960,31 +3109,31 @@ In MongoDB, the principle is simple:
 
 ---
 
-### **MongoDB Document Data Model**
+#### **MongoDB Document Data Model**
 
 MongoDB provides a **flexible document data model**, characterized by:
 
-#### 1. **Schema Flexibility**:
+##### 1. **Schema Flexibility**:
 
 - Collections do not enforce a strict structure.
 - Documents in the same collection can have different structures (**polymorphism**).
 
-#### 2. **Schema Validation**:
+##### 2. **Schema Validation**:
 
 - MongoDB allows schema definition and validation for structured storage.
 
-#### 3. **Nested or Embedded Documents**:
+##### 3. **Nested or Embedded Documents**:
 
 - Documents can include other documents, enabling complex relationships.
 
-#### 4. **Normalization and Embedding**:
+##### 4. **Normalization and Embedding**:
 
 - Normalize data using references when necessary.
 - Embed data when it will be accessed together frequently.
 
 ---
 
-### **MongoDB vs. Relational Databases**
+#### **MongoDB vs. Relational Databases**
 
 |Aspect|Relational Model|Document Model|
 |---|---|---|
@@ -2995,7 +3144,7 @@ MongoDB provides a **flexible document data model**, characterized by:
 
 ---
 
-### **Steps in Data Modeling with MongoDB**
+#### **Steps in Data Modeling with MongoDB**
 
 1. **Understand Application Requirements**:
     - Define access patterns and relationships.
@@ -3006,7 +3155,7 @@ MongoDB provides a **flexible document data model**, characterized by:
 
 ---
 
-### **Takeaway**
+#### **Takeaway**
 
 The goal of data modeling is to:
 
@@ -3019,13 +3168,13 @@ With these principles, you can build a robust, scalable data model tailored to y
 ___
 ### Lesson 2: Types of Data Relationships
 
-### **Understanding Data Relationships in MongoDB**
+#### **Understanding Data Relationships in MongoDB**
 
 This lesson introduces the common types of data relationships and the two primary methods for modeling them in MongoDB. The focus is on creating efficient schemas that align with how the application queries and updates data.
 
 ---
 
-### **Key Principle**
+#### **Key Principle**
 
 > **Data that is accessed together should be stored together.**
 
@@ -3033,7 +3182,7 @@ By adhering to this principle, you can reduce query complexity, optimize perform
 
 ---
 
-### **Types of Data Relationships**
+#### **Types of Data Relationships**
 
 1. **One-to-One**:
     
@@ -3043,7 +3192,7 @@ By adhering to this principle, you can reduce query complexity, optimize perform
         
         - Embed the director's information directly in the movie document.
         
-        ```js
+        ```json
         {
 	      "_id": ObjectId ("573a139@f29313caabcd413b") ,
           "title": "Star Wars: Episode IV - A New Hope",
@@ -3059,7 +3208,7 @@ By adhering to this principle, you can reduce query complexity, optimize perform
         
         - Use an array to embed the cast members.
         
-        ```js
+        ```json
         {
           "movie": "Star Wars",
           "cast": [
@@ -3078,7 +3227,7 @@ By adhering to this principle, you can reduce query complexity, optimize perform
 
 ---
 
-### **Methods of Modeling Relationships**
+#### **Methods of Modeling Relationships**
 
 1. **Embedding**:
     
@@ -3088,7 +3237,7 @@ By adhering to this principle, you can reduce query complexity, optimize perform
         - Simplifies the schema for closely associated data.
     - **Example**:
         
-        ```js
+        ```json
         {
           "movie": "Star Wars",
           "cast": ["Mark Hamill", "Carrie Fisher"],
@@ -3106,7 +3255,7 @@ By adhering to this principle, you can reduce query complexity, optimize perform
         - Useful for data that is not frequently accessed together or shared across entities.
     - **Example**:
         
-        ```js
+        ```json
         {
           "movie": "Star Wars",
           "filming_locations": [
@@ -3116,11 +3265,11 @@ By adhering to this principle, you can reduce query complexity, optimize perform
         }
         ```
 
-![Pasted image 20241125164017.png](assets/Pasted%20image%2020241125164017.png)
+![Alt text](assets/Pasted%20image%2020241125164017.png)
 
 ---
 
-### **When to Use Each Method**
+#### **When to Use Each Method**
 
 - **Embedding**:
     
@@ -3135,7 +3284,7 @@ By adhering to this principle, you can reduce query complexity, optimize perform
 
 ---
 
-### **Takeaways**
+#### **Takeaways**
 
 1. **Data Access Patterns**:
     - Structure data according to how the application queries and updates it.
@@ -3151,13 +3300,13 @@ ___
 
 ### Lesson 3: Modeling Data Relationships
 
-### **Detailed Example of Data Modeling**
+#### **Detailed Example of Data Modeling**
 
 This lesson provides a practical example of how to model data efficiently in MongoDB by using a student record as a case study. It focuses on handling one-to-many relationships and demonstrates the flexibility of MongoDB’s document model.
 
 ---
 
-### **Key Recap**
+#### **Key Recap**
 
 1. **Relationships**:
     - One-to-One
@@ -3169,7 +3318,7 @@ This lesson provides a practical example of how to model data efficiently in Mon
 
 ---
 
-### **Case Study: Student Record**
+#### **Case Study: Student Record**
 
 When a student starts school, their profile is created in the database. This profile includes:
 - Personal details
@@ -3178,16 +3327,16 @@ When a student starts school, their profile is created in the database. This pro
 
 ---
 
-### **Handling One-to-Many Relationships**
+#### **Handling One-to-Many Relationships**
 
-#### **Contact Phone Numbers**
+##### **Contact Phone Numbers**
 
 - **Original Representation**: Each phone number is stored as a separate item.
-	![Pasted image 20241125165811.png](assets/Pasted%20image%2020241125165811.png)
+	![Alt text](assets/Pasted%20image%2020241125165811.png)
     - **Issue**: This creates redundancy and lacks organization.
 - **Improved Representation**: Use an array to represent a one-to-many relationship.
     
-    ```js
+    ```json
     {
       "name": "John Doe",
       "phone_numbers": [
@@ -3200,7 +3349,7 @@ When a student starts school, their profile is created in the database. This pro
     
 - **Enhanced Representation with Context**: To maintain context (e.g., home, cell, or emergency contact), store additional metadata alongside each number.
     
-    ```js
+    ```json
     {
       "name": "John Doe",
       "phone_numbers": [
@@ -3214,16 +3363,16 @@ When a student starts school, their profile is created in the database. This pro
 
 ---
 
-### **Handling Large and Related Data**
+#### **Handling Large and Related Data**
 
-#### **Class Information**
+##### **Class Information**
 
 - If a student takes many classes, embedding all class details in the student document could make it bloated and inefficient to manage.
 - Instead, reference another collection that contains class details.
 
 **Example: Student Document**
 
-```js
+```json
 {
   "name": "John Doe",
   "phone_numbers": [
@@ -3239,7 +3388,7 @@ When a student starts school, their profile is created in the database. This pro
 
 **Example: Courses Collection**
 
-```js
+```json
 [
   { "course_id": "CS101", "course_name": "Intro to Computer Science", "instructor": "Dr. Smith" },
   { "course_id": "MATH203", "course_name": "Linear Algebra", "instructor": "Prof. Lee" }
@@ -3250,7 +3399,7 @@ By referencing the `course_id` and `course_name`, we avoid duplicating course de
 
 ---
 
-### **Key Takeaways**
+#### **Key Takeaways**
 
 1. **Relationships in MongoDB**:
     
@@ -3274,17 +3423,17 @@ ___
 
 ### Lesson 4: Embedding Data in Documents
 
-### **Modeling Data Using Embedding in MongoDB**
+#### **Modeling Data Using Embedding in MongoDB**
 
 This lesson explains the concept of **embedding** in MongoDB, highlighting its benefits, use cases, and potential pitfalls.
 
 ---
 
-### **What is Embedding?**
+#### **What is Embedding?**
 
 Embedding involves nesting one document inside another. It is particularly useful for **one-to-many** or **many-to-many** relationships, as it simplifies queries and enhances performance.
 
-#### **Key Features:**
+##### **Key Features:**
 
 - Simplifies data access by storing related data together.
 - Improves query performance by avoiding joins.
@@ -3292,13 +3441,13 @@ Embedding involves nesting one document inside another. It is particularly usefu
 
 ---
 
-### **Examples of Embedding**
+#### **Examples of Embedding**
 
-#### **Basic Example:**
+##### **Basic Example:**
 
 **Single-level embedding** for simple relationships like name:
 
-```js
+```json
 {
   "name": { 
     "firstName": "Sarah", 
@@ -3307,18 +3456,18 @@ Embedding involves nesting one document inside another. It is particularly usefu
 }
 ```
 
-#### **Complex Example:**
+##### **Complex Example:**
 
 **Multi-level embedding** for a one-to-many relationship, such as a customer with multiple addresses:
 
-![Pasted image 20241125170857.png](assets/Pasted%20image%2020241125170857.png)
+![Alt text](assets/Pasted%20image%2020241125170857.png)
 In this case:
 
 - The `Address` field is an array of embedded documents.
 
 ---
 
-### **Advantages of Embedding**
+#### **Advantages of Embedding**
 
 1. **Improved Performance**:
     - Embedding adheres to MongoDB’s principle: _“Data that is accessed together should be stored together.”_
@@ -3333,7 +3482,7 @@ In this case:
 
 ---
 
-### **Potential Pitfalls of Embedding**
+#### **Potential Pitfalls of Embedding**
 
 1. **Large Documents**:
     - Embedding can make documents grow excessively large, leading to:
@@ -3351,7 +3500,7 @@ In this case:
 
 ---
 
-### **Best Practices for Embedding**
+#### **Best Practices for Embedding**
 
 - Use **embedding** for related data that:
     - Is frequently accessed together.
@@ -3363,7 +3512,7 @@ In this case:
 
 ---
 
-### **Key Takeaways**
+#### **Key Takeaways**
 
 1. **Purpose**:
     - Embedding is a powerful method to model relationships in MongoDB.
@@ -3386,13 +3535,13 @@ ___
 
 ### Lesson 5: Referencing Data in Documents
 
-### **Modeling Data Using References in MongoDB**
+#### **Modeling Data Using References in MongoDB**
 
 This lesson introduces **references** (also called linking or data normalization) as a method for modeling relationships in MongoDB. It provides insights into when and why to use referencing instead of embedding.
 
 ---
 
-### **What are References?**
+#### **What are References?**
 
 References establish a link between documents stored in different collections. They store the `_id` of one document as a field in another document, ensuring the relationship is maintained without duplicating data.
 Using references sometimes is called linking or data normalization.
@@ -3409,17 +3558,17 @@ While embedding aligns with this principle, referencing is useful when:
 
 ---
 
-### **Example of Referencing**
+#### **Example of Referencing**
 
 #### **Scenario:**
 
 A student record that references the courses they are enrolled in.
 
-![Pasted image 20241125172746.png](assets/Pasted%20image%2020241125172746.png)
+![Alt text](assets/Pasted%20image%2020241125172746.png)
 
 **Student Document (in `students` collection):**
 
-```js
+```json
 {
   "_id": "student123",
   "name": "Sarah Davis",
@@ -3429,7 +3578,7 @@ A student record that references the courses they are enrolled in.
 
 **Course Documents (in `courses` collection):**
 
-```js
+```json
 {
   "_id": "course456",
   "name": "Introduction to MongoDB",
@@ -3437,7 +3586,7 @@ A student record that references the courses they are enrolled in.
 }
 ```
 
-```js
+```json
 {
   "_id": "course789",
   "name": "Advanced JavaScript",
@@ -3452,7 +3601,7 @@ Here:
 
 ---
 
-### **Advantages of Using References**
+#### **Advantages of Using References**
 
 1. **Avoids Data Duplication:**
     - Ensures that shared data, like course details, is stored in a single location.
@@ -3464,7 +3613,7 @@ Here:
 
 ---
 
-### **Disadvantages of Using References**
+#### **Disadvantages of Using References**
 
 1. **Multiple Queries:**
     - Retrieving related data requires querying multiple collections, increasing resource usage and latency.
@@ -3475,10 +3624,10 @@ Here:
 
 ---
 
-![Pasted image 20241125172552.png](assets/Pasted%20image%2020241125172552.png)
+![Alt text](assets/Pasted%20image%2020241125172552.png)
 
 ___
-### **When to Use References**
+#### **When to Use References**
 
 - **Use References When:**
     
@@ -3492,7 +3641,7 @@ ___
 
 ---
 
-### **Key Takeaways**
+#### **Key Takeaways**
 
 1. **Purpose:**
     - References link documents across collections, maintaining relationships without duplicating data.
@@ -3512,13 +3661,13 @@ ___
 
 ### Lesson 6: Scaling a Data Model
 
-### **Avoiding Scalability Issues in MongoDB Data Models**
+#### **Avoiding Scalability Issues in MongoDB Data Models**
 
 This lesson highlights common problems with non-scalable data models and strategies to design efficient and scalable schemas in MongoDB. The key focus is on **unbounded documents** and how to avoid them.
 
 ---
 
-### **Key Principle:**
+#### **Key Principle:**
 
 _"Data that is accessed together should be stored together."_
 
@@ -3531,7 +3680,7 @@ Your data model must align with your query patterns to achieve:
 
 ---
 
-### **Understanding Unbounded Documents**
+#### **Understanding Unbounded Documents**
 
 Unbounded documents are those that grow infinitely as new data is added. These are problematic because they:
 
@@ -3546,9 +3695,9 @@ Unbounded documents are those that grow infinitely as new data is added. These a
 
 #### **Initial Model (Embedding Comments):**
 
-![Pasted image 20241125190324.png](assets/Pasted%20image%2020241125190324.png)
+![Alt text](assets/Pasted%20image%2020241125190324.png)
 
-```js
+```json
 {
   "_id": "post123",
   "title": "Understanding MongoDB",
@@ -3571,14 +3720,14 @@ This model:
 
 ---
 
-### **Optimized Model (Using References):**
+#### **Optimized Model (Using References):**
 
 To scale efficiently, separate comments into their own collection and use references.
 
-![Pasted image 20241125190334.png](assets/Pasted%20image%2020241125190334.png)
-#### **Blog Post Collection:**
+![Alt text](assets/Pasted%20image%2020241125190334.png)
+##### **Blog Post Collection:**
 
-```js
+```json
 {
   "_id": "post123",
   "title": "Understanding MongoDB",
@@ -3586,9 +3735,9 @@ To scale efficiently, separate comments into their own collection and use refere
 }
 ```
 
-#### **Comments Collection:**
+##### **Comments Collection:**
 
-```js
+```json
 {
   "_id": "comment456",
   "postId": "post123",
@@ -3597,7 +3746,7 @@ To scale efficiently, separate comments into their own collection and use refere
 }
 ```
 
-```js
+```json
 {
   "_id": "comment789",
   "postId": "post123",
@@ -3615,7 +3764,7 @@ To scale efficiently, separate comments into their own collection and use refere
 
 ---
 
-### **Key Considerations for Scalable Data Models**
+#### **Key Considerations for Scalable Data Models**
 
 1. **Embed vs. Reference:**
     - Embed data for **small, frequently accessed** relationships.
@@ -3632,7 +3781,7 @@ To scale efficiently, separate comments into their own collection and use refere
 
 ---
 
-### **Key Takeaways**
+#### **Key Takeaways**
 
 1. Avoid unbounded documents, as they lead to performance issues and can hit the document size limit.
 2. Use **embedding** for tightly coupled, small data sets.
@@ -3669,35 +3818,35 @@ Schema anti-patterns occur when data modeling doesn't follow best practices, lea
 
 ---
 
-### **Tools for Identifying Anti-Patterns**
+#### **Tools for Identifying Anti-Patterns**
 
 MongoDB Atlas provides two main tools to help identify and fix schema anti-patterns: **Data Explorer** and **Performance Advisor**.
 
-#### **1. Data Explorer (Available in Free Tier):**
+##### **1. Data Explorer (Available in Free Tier):**
 
 - Accessible via **Browse Collections** in the Atlas interface.
 - Features:
     - View **storage size**, **document count**, and **index size** for collections.
     - **Indexes Tab**: Displays indexes and their stats to identify unused or redundant ones.
-	    ![Pasted image 20241125192235.png](assets/Pasted%20image%2020241125192235.png)
+	    ![Alt text](assets/Pasted%20image%2020241125192235.png)
     - **Schema Anti-Pattern Tab**:
         - Highlights potential schema design issues.
         - Provides detailed recommendations for resolving them.
     - Example Action: Dropping unused indexes by sorting them based on usage.
-	    ![Pasted image 20241125192316.png](assets/Pasted%20image%2020241125192316.png)
+	    ![Alt text](assets/Pasted%20image%2020241125192316.png)
 
-#### **2. Performance Advisor (Available in M10 Tier and Above):**
+##### **2. Performance Advisor (Available in M10 Tier and Above):**
 
 - Analyzes **active collections** and queries to suggest performance improvements.
 - Features:
     - Recommends **new indexes** for slow or frequent queries.
     - Identifies **redundant indexes** that can be dropped.
     - Highlights **schema issues** impacting performance.
-	    ![Pasted image 20241125192400.png](assets/Pasted%20image%2020241125192400.png)
+	    ![Alt text](assets/Pasted%20image%2020241125192400.png)
 
 ---
 
-### **Steps to Fix Anti-Patterns:**
+#### **Steps to Fix Anti-Patterns:**
 
 1. **Using Data Explorer:**
     
@@ -3712,7 +3861,7 @@ MongoDB Atlas provides two main tools to help identify and fix schema anti-patte
 
 ---
 
-### **Key Takeaways**
+#### **Key Takeaways**
 
 1. **Schema Anti-Patterns**:
     - Avoid massive arrays, excessive collections, bloated documents, and unused indexes.
@@ -3726,7 +3875,7 @@ By leveraging these tools, you can ensure scalable and efficient MongoDB schemas
 
 ___
 
-## Introduction to MongoDB Data Modeling  
+### Introduction to MongoDB Data Modeling  
 
 In this unit, you learned how to:
 
@@ -3745,7 +3894,7 @@ Schema validation in MongoDB allows you to enforce rules on the structure, conte
 
 ---
 
-### **Key Concepts**
+#### **Key Concepts**
 
 - **Validation Level**: Defines how strictly validation rules are applied to documents.
     - **strict**: Documents must fully comply with validation rules.
@@ -3756,7 +3905,7 @@ Schema validation in MongoDB allows you to enforce rules on the structure, conte
 
 ---
 
-### **Defining Schema Validation**
+#### **Defining Schema Validation**
 
 Schema validation is set using the `$jsonSchema` keyword when creating or updating a collection:
 
@@ -3790,7 +3939,7 @@ db.createCollection("products", {
 
 ---
 
-### **Key Validation Features**
+#### **Key Validation Features**
 
 1. **Field Type Validation**: Ensures fields are specific BSON types, like `string`, `number`, `array`, or `date`.
     
@@ -3808,9 +3957,9 @@ db.createCollection("products", {
 
 ---
 
-### **Examples**
+#### **Examples**
 
-#### 1. **Validating String Fields**
+##### 1. **Validating String Fields**
 
 ```javascript
 "status": {
@@ -3827,7 +3976,7 @@ db.createCollection("products", {
   description: 'Maximum length for name is 100 chars'
 }
 ```
-#### 2. **Validating Number Ranges**
+##### 2. **Validating Number Ranges**
 
 ```javascript
 "age": {
@@ -3838,7 +3987,7 @@ db.createCollection("products", {
 }
 ```
 
-#### 3. **Validating Arrays**
+##### 3. **Validating Arrays**
 
 ```javascript
 "tags": {
@@ -3850,7 +3999,7 @@ db.createCollection("products", {
 }
 ```
 
-#### 4. **Validating Nested Documents**
+##### 4. **Validating Nested Documents**
 
 ```javascript
 "address": {
@@ -3870,7 +4019,7 @@ db.createCollection("products", {
 }
 ```
 
-#### 5. **Additional Properties**
+##### 5. **Additional Properties**
 
 - Control whether extra fields outside the defined schema are allowed. Example:
 ```js
@@ -3879,7 +4028,7 @@ db.createCollection("products", {
 }
 ```
         
-#### 6. **Conditional Validation**:
+##### 6. **Conditional Validation**:
 - Specify rules based on the presence or value of other fields. Example:
 ```js
 {   
@@ -3889,7 +4038,7 @@ db.createCollection("products", {
 ```
 ---
 
-### **Updating Schema Validation**
+#### **Updating Schema Validation**
 
 You can update the schema validation rules using the `collMod` command:
 
@@ -3913,7 +4062,7 @@ db.runCommand({
 
 ---
 
-### **Advantages of Schema Validation**
+#### **Advantages of Schema Validation**
 
 - Ensures data integrity and consistency.
 - Reduces application-side validation overhead.
@@ -3921,7 +4070,7 @@ db.runCommand({
 
 ---
 
-### **Caveats**
+#### **Caveats**
 
 - Validation applies only to inserts and updates; existing documents are unaffected unless modified.
 - Validation adds some overhead, especially for complex rules.
@@ -3932,13 +4081,13 @@ Schema validation in MongoDB is a powerful tool for balancing the flexibility of
 ___
 ## Unit 12: MongoDB Transactions
 ### Lesson 1: Introduction to ACID Transactions
-### **ACID Transactions: Ensuring Database Integrity**
+#### **ACID Transactions: Ensuring Database Integrity**
 
 This lesson introduces **ACID transactions**, explaining their properties, use cases, and why they are essential for maintaining data integrity and consistency during complex database operations.
 
 ---
 
-### **What Are ACID Transactions?**
+#### **What Are ACID Transactions?**
 
 An **ACID transaction** is a group of database operations that:
 
@@ -3952,7 +4101,7 @@ An **ACID transaction** is a group of database operations that:
 
 ---
 
-### **ACID Properties**
+#### **ACID Properties**
 
 ACID is an acronym for the properties that ensure database safety during transactions:
 
@@ -3977,7 +4126,7 @@ ACID is an acronym for the properties that ensure database safety during transac
 
 ---
 
-### **Use Cases for ACID Transactions**
+#### **Use Cases for ACID Transactions**
 
 ACID transactions are crucial in scenarios where **value transfer or integrity** is at stake, such as:
 
@@ -3988,7 +4137,7 @@ ACID transactions are crucial in scenarios where **value transfer or integrity**
 
 ---
 
-### **Key Takeaways**
+#### **Key Takeaways**
 
 1. **Definition**: ACID transactions ensure that all database operations in a transaction execute as a single, reliable unit.
 2. **Properties**:
@@ -4007,13 +4156,13 @@ ___
 
 ### Lesson 2: ACID Transactions in MongoDB
 
-### **ACID Transactions in MongoDB: Single vs. Multidocument Operations**
+#### **ACID Transactions in MongoDB: Single vs. Multidocument Operations**
 
 This lesson explains how **ACID transactions** work in MongoDB's document model, focusing on the distinction between **single-document** and **multidocument** transactions and their use cases.
 
 ---
 
-### **Single-Document Transactions**
+#### **Single-Document Transactions**
 
 - In MongoDB, **operations on a single document** are **inherently atomic**.
 - Example: Using the `updateOne` method to modify multiple fields in a single document ensures that either all changes are applied or none are.
@@ -4021,23 +4170,23 @@ This lesson explains how **ACID transactions** work in MongoDB's document model,
     - Changes are visible simultaneously to all clients.
     - No additional steps are required to ensure ACID compliance.
 
-![Pasted image 20241126121044.png](assets/Pasted%20image%2020241126121044.png)
+![Alt text](assets/Pasted%20image%2020241126121044.png)
 
 ---
 
-### **Multidocument Transactions**
+#### **Multidocument Transactions**
 
 - Operations affecting **multiple documents** are **not inherently atomic**. To make them atomic, they must be wrapped in a **multidocument ACID transaction**.
 - Example: In an e-commerce application:
     - Adding an item to a shopping cart (updates a document in the `shoppingCart` collection).
-	    ![Pasted image 20241126121350.png](assets/Pasted%20image%2020241126121350.png)
+	    ![Alt text](assets/Pasted%20image%2020241126121350.png)
     - Deducting the same item from the inventory (updates a document in the `inventory` collection).  
-	    ![Pasted image 20241126121416.png](assets/Pasted%20image%2020241126121416.png)
+	    ![Alt text](assets/Pasted%20image%2020241126121416.png)
         Both operations must succeed or fail together to ensure data consistency.
 
 ---
 
-### **When to Use Multidocument Transactions**
+#### **When to Use Multidocument Transactions**
 
 - Use multidocument transactions only when **ACID properties** are absolutely necessary for:
     
@@ -4050,7 +4199,7 @@ This lesson explains how **ACID transactions** work in MongoDB's document model,
 
 ---
 
-### **Key Takeaways**
+#### **Key Takeaways**
 
 1. **Single-Document Operations**:
     - Inherently atomic.
@@ -4068,13 +4217,13 @@ ___
 
 ### Lesson 3: Using Transactions in MongoDB
 
-### **How to Use Multi-Document Transactions in MongoDB**
+#### **How to Use Multi-Document Transactions in MongoDB**
 
 This video explains how to execute, commit, and abort **multi-document transactions** in MongoDB using the shell, which mirrors the process used in MongoDB drivers. The example focuses on transferring funds between two accounts.
 
 ---
 
-### **Steps for Multi-Document Transactions**
+#### **Steps for Multi-Document Transactions**
 
 1. **Start a Session**:
     
@@ -4162,7 +4311,7 @@ This video explains how to execute, commit, and abort **multi-document transacti
 
 ---
 
-### **Example Scenario**
+#### **Example Scenario**
 
 **Initial Balances**:
 
@@ -4180,7 +4329,7 @@ This video explains how to execute, commit, and abort **multi-document transacti
 
 ---
 
-### **Key Considerations**
+#### **Key Considerations**
 
 - **Timeout**: Transactions must complete within **60 seconds** of the first write. If timed out, restart the transaction.
 	- MongoServerError: Transation 1 has been aborted
@@ -4189,7 +4338,7 @@ This video explains how to execute, commit, and abort **multi-document transacti
 
 ---
 
-### **Key Takeaways**
+#### **Key Takeaways**
 
 - **Start a Session**: Use `startSession` to initiate a session for the transaction.
 - **Transaction Control**: Use `startTransaction`, `commitTransaction`, and `abortTransaction` to manage transaction flow.
@@ -4197,7 +4346,7 @@ This video explains how to execute, commit, and abort **multi-document transacti
 
 ___
 
-#### MongoDB Transactions
+### MongoDB Transactions
 
 In this unit, you learned that ACID transactions ensure that database operations, such as transferring funds from one account to another, happen together or not at all. You also explored how ACID transactions work with the document model in MongoDB. Finally, you learned how to create and use multi-document transactions by using the `startTransaction()` and `commitTransaction()` commands, and how to cancel multi-document transactions by using the `abortTransaction()` command.
 
