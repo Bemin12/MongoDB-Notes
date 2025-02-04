@@ -452,7 +452,7 @@ ___
      - `matchedCount`: The number of documents that matched the filter criteria.
      - `modifiedCount`: The number of documents that were replaced.
    - Example output:
-     ```json
+     ```js
      {
 	   "acknowledged": true,
 	   insertedId: null,
@@ -490,7 +490,7 @@ The `updateOne()` method accepts a __filter document__, an __update document__
 
 The `$set` operator replaces the value of a field with the specified value or Adds new fields and values to a document, as shown in the following code:
 
-```json
+```js
 db.podcasts.updateOne(
   {
     _id: ObjectId("5e8f8f8f8f8f8f8f8f8f8f8"),
@@ -505,7 +505,7 @@ db.podcasts.updateOne(
 ```
 
 The output message shows the matched and modified document counts
-```json
+```js
     {
 	   "acknowledged": true,
 	   insertedId: null,
@@ -519,7 +519,7 @@ If the update filter doesn't match any documents, then no update occurs.
 
 The `upsert` option creates a new document if no documents match the filtered criteria. Here's an example:
 
-```json
+```js
 db.podcasts.updateOne(
   { title: "The Developer Hub" },
   { $set: { topics: ["databases", "MongoDB"] } },
@@ -532,7 +532,7 @@ The `upsert` is short for _update or insert_
 
 The `$push` operator adds a new value to the `hosts` array field. If the field is absent, `$push` adds the array field with the value as its element Here's an example:
 
-```json
+```js
 db.podcasts.updateOne(
   { _id: ObjectId("5e8f8f8f8f8f8f8f8f8f8f8") },
   { $push: { hosts: "Nic Raboy" } }
@@ -540,7 +540,7 @@ db.podcasts.updateOne(
 ```
 
 Use [`$push`](https://www.mongodb.com/docs/manual/reference/operator/update/push/#mongodb-update-up.-push) with the [`$each`](https://www.mongodb.com/docs/manual/reference/operator/update/each/#mongodb-update-up.-each) modifier to append multiple values to the array field.
-```json
+```js
 db.students.updateOne(
    { name: "joe" },
    { $push: { scores: { $each: [ 90, 92, 85 ] } } }
@@ -570,7 +570,7 @@ Use [`$addToSet`](https://www.mongodb.com/docs/manual/reference/operator/update
 The [`$inc`](https://www.mongodb.com/docs/manual/reference/operator/update/inc/#mongodb-update-up.-inc) operator increments a field by a specified value.
 `{ $inc: { <field1>: <amount1>, <field2>: <amount2>, ... } }`
 
-```json
+```js
 db.products.updateOne(
    { sku: "abc123" },
    { $inc: { quantity: -2, "metrics.orders": 1 } }
@@ -622,7 +622,7 @@ ___
    - The modified document is returned, showing the updated `downloads` field. For instance, if the original value was 6012, the output will display `downloads: 6013`.
 
 6. __Using `upsert`__
-	```json
+	```js
 	db.zips.findAndModify({
 	  query: { zip: 87571 },
 	  update: { $set: { city: "TAOS", state: "NM", pop: 40000 } },
@@ -2205,7 +2205,7 @@ Start by creating a search index on your own dataset and testing it with real qu
 ___
 #### **The Lab**
 
-```json
+```js
 {
     "name": "sample_supplies-sales-dynamic",
     "searchAnalyzer": "lucene.standard",
@@ -2386,7 +2386,7 @@ ___
 #### **The Lab**
 We have a dataset that contains records from an office supply company. The records contain information about orders, products, and customers. Imagine we are working on an application with a dashboard for administrators keeping track of sales at our office supply company. We want to add search functionality so that administrators can easily find sales matching their criteria. First we need to create a search index for the `sales` collection!
 
-```json
+```js
 {
     "name": "sample_supplies-sales-static",
     "searchAnalyzer": "lucene.standard",
@@ -2425,7 +2425,7 @@ You will be connected to your Atlas cluster and to the `sample_supplies` datab
 
 The following code is a snippet from a search index. What type of field mapping does this search index use? (Select one.)
 
-```json
+```js
 {
     "mappings": {
         "dynamic": false,
@@ -2484,7 +2484,7 @@ Let’s create an application for bird enthusiasts where users can search for bi
 
 Here’s how the pipeline might look:
 
-```json
+```js
 {
   "$search": {
     "index": "default",
@@ -2898,7 +2898,7 @@ The `$searchMeta` stage provides metadata about search results, including:
 
 Below is an example query to group bird sightings by **weeks**:
 
-```json
+```js
 {
   "$searchMeta": {
     "index": "default",
@@ -2986,7 +2986,7 @@ We have a dataset that contains records from an office supply company. The recor
     
 2. Edit the JSON file in the IDE as follows: changing the value for the second field 'type' for 'purchaseMethod' in 'fields' to `string` and change the second field 'type' for 'storeLocation' to `stringFacet` to reflect the sample below.
 
-```json
+```js
 {
     "name": "sample_supplies-sales-facets",
     "searchAnalyzer": "lucene.standard",
@@ -3192,7 +3192,7 @@ By adhering to this principle, you can reduce query complexity, optimize perform
         
         - Embed the director's information directly in the movie document.
         
-        ```json
+        ```js
         {
 	      "_id": ObjectId ("573a139@f29313caabcd413b") ,
           "title": "Star Wars: Episode IV - A New Hope",
@@ -3208,7 +3208,7 @@ By adhering to this principle, you can reduce query complexity, optimize perform
         
         - Use an array to embed the cast members.
         
-        ```json
+        ```js
         {
           "movie": "Star Wars",
           "cast": [
@@ -3237,7 +3237,7 @@ By adhering to this principle, you can reduce query complexity, optimize perform
         - Simplifies the schema for closely associated data.
     - **Example**:
         
-        ```json
+        ```js
         {
           "movie": "Star Wars",
           "cast": ["Mark Hamill", "Carrie Fisher"],
@@ -3255,7 +3255,7 @@ By adhering to this principle, you can reduce query complexity, optimize perform
         - Useful for data that is not frequently accessed together or shared across entities.
     - **Example**:
         
-        ```json
+        ```js
         {
           "movie": "Star Wars",
           "filming_locations": [
@@ -3336,7 +3336,7 @@ When a student starts school, their profile is created in the database. This pro
     - **Issue**: This creates redundancy and lacks organization.
 - **Improved Representation**: Use an array to represent a one-to-many relationship.
     
-    ```json
+    ```js
     {
       "name": "John Doe",
       "phone_numbers": [
@@ -3349,7 +3349,7 @@ When a student starts school, their profile is created in the database. This pro
     
 - **Enhanced Representation with Context**: To maintain context (e.g., home, cell, or emergency contact), store additional metadata alongside each number.
     
-    ```json
+    ```js
     {
       "name": "John Doe",
       "phone_numbers": [
@@ -3372,7 +3372,7 @@ When a student starts school, their profile is created in the database. This pro
 
 **Example: Student Document**
 
-```json
+```js
 {
   "name": "John Doe",
   "phone_numbers": [
@@ -3388,7 +3388,7 @@ When a student starts school, their profile is created in the database. This pro
 
 **Example: Courses Collection**
 
-```json
+```js
 [
   { "course_id": "CS101", "course_name": "Intro to Computer Science", "instructor": "Dr. Smith" },
   { "course_id": "MATH203", "course_name": "Linear Algebra", "instructor": "Prof. Lee" }
@@ -3447,7 +3447,7 @@ Embedding involves nesting one document inside another. It is particularly usefu
 
 **Single-level embedding** for simple relationships like name:
 
-```json
+```js
 {
   "name": { 
     "firstName": "Sarah", 
@@ -3568,7 +3568,7 @@ A student record that references the courses they are enrolled in.
 
 **Student Document (in `students` collection):**
 
-```json
+```js
 {
   "_id": "student123",
   "name": "Sarah Davis",
@@ -3578,7 +3578,7 @@ A student record that references the courses they are enrolled in.
 
 **Course Documents (in `courses` collection):**
 
-```json
+```js
 {
   "_id": "course456",
   "name": "Introduction to MongoDB",
@@ -3586,7 +3586,7 @@ A student record that references the courses they are enrolled in.
 }
 ```
 
-```json
+```js
 {
   "_id": "course789",
   "name": "Advanced JavaScript",
@@ -3697,7 +3697,7 @@ Unbounded documents are those that grow infinitely as new data is added. These a
 
 ![Alt text](assets/Pasted%20image%2020241125190324.png)
 
-```json
+```js
 {
   "_id": "post123",
   "title": "Understanding MongoDB",
@@ -3727,7 +3727,7 @@ To scale efficiently, separate comments into their own collection and use refere
 ![Alt text](assets/Pasted%20image%2020241125190334.png)
 ##### **Blog Post Collection:**
 
-```json
+```js
 {
   "_id": "post123",
   "title": "Understanding MongoDB",
@@ -3737,7 +3737,7 @@ To scale efficiently, separate comments into their own collection and use refere
 
 ##### **Comments Collection:**
 
-```json
+```js
 {
   "_id": "comment456",
   "postId": "post123",
@@ -3746,7 +3746,7 @@ To scale efficiently, separate comments into their own collection and use refere
 }
 ```
 
-```json
+```js
 {
   "_id": "comment789",
   "postId": "post123",
